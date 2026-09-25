@@ -1,0 +1,74 @@
+{
+  "name": "tela-compartilhada",
+  "productName": "Tela Compartilhada",
+  "version": "1.2.0",
+  "description": "Compartilhamento de tela P2P (WebRTC) via Radmin VPN — sem servidor pago, até 1080p 60fps.",
+  "main": "main.js",
+  "author": "Gabriel Azevedo Cruz",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win --x64",
+    "dist:linux": "electron-builder --linux --x64",
+    "dist": "electron-builder --win --linux --x64"
+  },
+  "devDependencies": {
+    "electron": "33.4.0",
+    "electron-builder": "24.13.3"
+  },
+  "dependencies": {
+    "ws": "8.18.0"
+  },
+  "build": {
+    "appId": "com.gabrielcruz.telacompartilhada",
+    "productName": "Tela Compartilhada",
+    "asar": true,
+    "compression": "normal",
+    "removePackageScripts": true,
+    "files": [
+      "**/*",
+      "!*.md",
+      "!.git/**",
+      "!node_modules/.cache/**"
+    ],
+
+    "win": {
+      "target": [
+        { "target": "nsis",     "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "requestedExecutionLevel": "asInvoker",
+      "forceCodeSigning": false,
+      "sign": null
+    },
+
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "artifactName": "TelaCompartilhada-Setup-${version}.exe",
+      "shortcutName": "Tela Compartilhada",
+      "uninstallDisplayName": "Tela Compartilhada",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true
+    },
+
+    "portable": {
+      "artifactName": "TelaCompartilhada-Portable-${version}.exe"
+    },
+
+    "linux": {
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] },
+        { "target": "deb",      "arch": ["x64"] }
+      ],
+      "category": "Network",
+      "synopsis": "Compartilhamento de tela P2P via Radmin VPN",
+      "artifactName": "TelaCompartilhada-${version}-${arch}.${ext}"
+    }
+  },
+  "allowScripts": {
+    "electron@33.4.0": true
+  }
+}
