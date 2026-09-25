@@ -55,9 +55,12 @@ document.getElementById('btnThemeToggle').addEventListener('click', async () => 
 
 // ═══════════════════════════ PERFIL ══════════════════════════════════════════════
 async function loadProfileIntoUI() {
-  state.profile        = await api.getProfile();
-  state.platform       = await api.getPlatform();
-  state.qualityPresets = await api.getQualityPresets();
+  // Paraleliza as 3 chamadas IPC em vez de esperar uma por uma
+  [state.profile, state.platform, state.qualityPresets] = await Promise.all([
+    api.getProfile(),
+    api.getPlatform(),
+    api.getQualityPresets()
+  ]);
 
   const p = state.profile;
   document.documentElement.dataset.theme = p.theme || 'dark';
@@ -841,7 +844,10 @@ function escapeHtml(str) {
 
 // ═══════════════════════════ INICIALIZAÇÃO ══════════════════════════════════════════
 (async function init() {
-  const ver = await api.getVersion();
+  // Roda em paralelo: versão e perfil são independentes
+  const [ver] = await Promise.all([
+    api.getVersion(),
+    loadProfileIntoUI()
+  ]);
   document.getElementById('appVersion').textContent = `v${ver}`;
-  await loadProfileIntoUI();
 })();

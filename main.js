@@ -76,6 +76,7 @@ function createWindow() {
     minWidth:        900,
     minHeight:       600,
     backgroundColor: '#0f1115',
+    show:            false,         // não mostra até estar pronto (evita flash branco)
     autoHideMenuBar: true,
     webPreferences: {
       preload:          path.join(__dirname, 'preload.js'),
@@ -85,6 +86,9 @@ function createWindow() {
       webSecurity:      false   // permite carregar file:// para avatares locais
     }
   });
+
+  // Mostra a janela só quando o renderer terminou de pintar o primeiro frame
+  mainWindow.once('ready-to-show', () => mainWindow.show());
 
   // ── Necessário no Electron 33+ para captura manual via desktopCapturer ──────
   session.defaultSession.setDisplayMediaRequestHandler((_req, cb) => {
@@ -130,14 +134,13 @@ ipcMain.handle('profile:pick-avatar', async () => {
 ipcMain.handle('sources:list', async () => {
   const sources = await desktopCapturer.getSources({
     types:            ['screen', 'window'],
-    thumbnailSize:    { width: 384, height: 216 },
-    fetchWindowIcons: true
+    thumbnailSize:    { width: 256, height: 144 },  // menor = mais rápido
+    fetchWindowIcons: false                          // ícones de app são lentos
   });
   return sources.map((s) => ({
     id:        s.id,
     name:      s.name,
-    thumbnail: s.thumbnail.toDataURL(),
-    appIcon:   s.appIcon ? s.appIcon.toDataURL() : null
+    thumbnail: s.thumbnail.toDataURL()
   }));
 });
 
