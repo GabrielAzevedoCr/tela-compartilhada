@@ -8,7 +8,7 @@ Compartilhamento de tela P2P via **Radmin VPN** — sem servidor pago, até **10
 
 | Plataforma | Link |
 |------------|------|
-| **Windows** (portátil, sem instalar) | [TelaCompartilhada-Portable-1.2.0.exe](https://github.com/GabrielAzevedoCr/tela-compartilhada/releases/download/v1.2.0/TelaCompartilhada-Portable-1.2.0.exe) |
+| **Windows** (portátil, sem instalar) | [TelaCompartilhada-Portable-1.3.0.exe](https://github.com/GabrielAzevedoCr/tela-compartilhada/releases/download/v1.3.0/TelaCompartilhada-Portable-1.3.0.exe) |
 | **Linux** (AppImage) | [Gerar no Linux — veja abaixo ↓](#linux) |
 
 > Todas as versões: [github.com/GabrielAzevedoCr/tela-compartilhada/releases](https://github.com/GabrielAzevedoCr/tela-compartilhada/releases)
