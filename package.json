@@ -1,7 +1,7 @@
 {
   "name": "tela-compartilhada",
   "productName": "Tela Compartilhada",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Compartilhamento de tela P2P (WebRTC) via Radmin VPN — sem servidor pago, até 1080p 60fps.",
   "main": "main.js",
   "author": "Gabriel Azevedo Cruz",
@@ -23,7 +23,7 @@
     "appId": "com.gabrielcruz.telacompartilhada",
     "productName": "Tela Compartilhada",
     "asar": true,
-    "compression": "normal",
+    "compression": "store",
     "removePackageScripts": true,
     "files": [
       "**/*",
@@ -34,7 +34,6 @@
 
     "win": {
       "target": [
-        { "target": "nsis",     "arch": ["x64"] },
         { "target": "portable", "arch": ["x64"] }
       ],
       "requestedExecutionLevel": "asInvoker",

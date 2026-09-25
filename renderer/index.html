@@ -143,6 +143,7 @@
               Sair
             </button>
           </div>
+          <div id="broadcastStatus" class="status" style="margin-top: 8px;"></div>
         </div>
 
         <div class="room-body">
@@ -244,8 +245,14 @@
       </div>
       <div id="sourceGrid" class="source-grid"></div>
       <div class="modal-footer">
-        <button class="secondary" id="btnCancelSource">Cancelar</button>
-        <button class="primary" id="btnConfirmSource" disabled>Transmitir selecionado</button>
+        <label class="checkbox-label">
+          <input type="checkbox" id="chkIncludeAudio" checked />
+          Incluir áudio do sistema
+        </label>
+        <div class="modal-footer-actions">
+          <button class="secondary" id="btnCancelSource">Cancelar</button>
+          <button class="primary" id="btnConfirmSource" disabled>Transmitir selecionado</button>
+        </div>
       </div>
     </div>
   </div>

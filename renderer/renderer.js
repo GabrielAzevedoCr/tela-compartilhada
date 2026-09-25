@@ -468,13 +468,61 @@ document.getElementById('btnToggleBroadcast').addEventListener('click', async ()
   await openSourceModal();
 });
 
-async function startBroadcastWithSource(sourceId) {
-  const preset = getActivePreset();
-  let stream;
+// ─── Captura de áudio do sistema (loopback) excluindo Discord ─────────────────
+//
+// Estratégia:
+//   Windows: getUserMedia com chromeMediaSource:'desktop' captura áudio loopback
+//            do sistema inteiro. Filtramos o Discord com Web Audio API —
+//            abrimos também o microfone do Discord via enumerateDevices e
+//            subtraímos do mix usando um InverterNode (phase inversion).
+//            Na prática, a forma mais confiável é capturar loopback do sistema
+//            e usar um GainNode que muta quando detecta fala no canal do Discord.
+//            MAS o Electron não expõe qual processo gerou o áudio.
+//            Solução real usada aqui: captura loopback normal + instrução ao
+//            usuário para mutar Discord nas configurações de som do Windows/Linux.
+//
+//   Linux:   getDisplayMedia com audio:true deixa o PipeWire/portal escolher
+//            a fonte de áudio separadamente (o usuário pode excluir Discord lá).
+
+async function captureSystemAudio(sourceId) {
+  const includeAudio = document.getElementById('chkIncludeAudio')?.checked ?? true;
+  if (!includeAudio) return null;
+
+  let audioStream = null;
 
   try {
     if (state.platform === 'linux') {
-      // ── Linux: tenta PipeWire/portal primeiro, cai para desktopCapturer ──────
+      // No Linux com PipeWire o áudio vem junto no getDisplayMedia
+      return null; // será tratado junto com o vídeo
+    }
+
+    // Windows: captura loopback do sistema via chromeMediaSource desktop
+    // O sourceId 'screen:0:0' captura o áudio de toda saída de áudio do sistema
+    audioStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        mandatory: {
+          chromeMediaSource: 'desktop'
+          // Não passa chromeMediaSourceId para pegar o loopback geral do sistema
+        }
+      },
+      video: false
+    });
+  } catch (err) {
+    console.warn('Áudio do sistema não disponível:', err.message);
+    return null;
+  }
+
+  return audioStream;
+}
+
+async function startBroadcastWithSource(sourceId) {
+  const preset = getActivePreset();
+  let stream;
+  const includeAudio = document.getElementById('chkIncludeAudio')?.checked ?? true;
+
+  try {
+    if (state.platform === 'linux') {
+      // ── Linux: getDisplayMedia com audio:true (PipeWire escolhe a fonte) ──────
       try {
         stream = await navigator.mediaDevices.getDisplayMedia({
           video: {
@@ -482,10 +530,10 @@ async function startBroadcastWithSource(sourceId) {
             height:    { ideal: preset.height },
             frameRate: { ideal: preset.frameRate }
           },
-          audio: false
+          audio: includeAudio   // PipeWire abre seletor de fonte de áudio
         });
       } catch {
-        // Fallback: usa desktopCapturer (funciona no X11 / Electron com Xorg)
+        // Fallback X11: sem áudio
         stream = await navigator.mediaDevices.getUserMedia({
           audio: false,
           video: {
@@ -500,7 +548,7 @@ async function startBroadcastWithSource(sourceId) {
         });
       }
     } else {
-      // ── Windows / macOS: usa desktopCapturer direto ──────────────────────────
+      // ── Windows: captura vídeo da fonte escolhida ────────────────────────────
       stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
@@ -515,6 +563,31 @@ async function startBroadcastWithSource(sourceId) {
           }
         }
       });
+
+      // ── Windows: adiciona áudio loopback do sistema separadamente ─────────────
+      if (includeAudio) {
+        try {
+          const audioStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+              mandatory: { chromeMediaSource: 'desktop' }
+            },
+            video: false
+          });
+
+          // Pega a track de áudio e mistura com o stream de vídeo
+          const audioTrack = audioStream.getAudioTracks()[0];
+          if (audioTrack) {
+            stream.addTrack(audioTrack);
+          }
+        } catch (audioErr) {
+          // Áudio do sistema não disponível (normal em algumas configs do Windows)
+          console.warn('Loopback de áudio não disponível:', audioErr.message);
+          setStatus('broadcastStatus',
+            '⚠ Sem áudio do sistema — ative "Mixagem estéreo" ou "What U Hear" no painel de som do Windows.',
+            'error');
+          setTimeout(() => setStatus('broadcastStatus', '', ''), 6000);
+        }
+      }
     }
   } catch (err) {
     alert('Não foi possível capturar a tela:\n' + err.message);

@@ -57,6 +57,20 @@ Funciona igual ao Windows — abre um modal visual para escolher a tela/janela.
 - Quem quer assistir **entra na sala** com o IP da Radmin VPN do criador (`26.x.x.x:porta`).
 - O vídeo vai **direto de PC para PC** via WebRTC — sem servidor intermediário pago.
 
+### Áudio do sistema
+
+A transmissão pode incluir o **áudio do sistema** (o que você escuta no PC) junto com a tela:
+
+**Windows:**
+- Use o checkbox "Incluir áudio do sistema" no modal de fonte
+- Se não funcionar: abra `Painel de Controle > Som > Gravação` e ative "Mixagem Estéreo" ou "What U Hear"
+- **⚠️ Discord:** o app não consegue filtrar o Discord automaticamente. **Solução:** mute o Discord nas configurações de som do Windows ou no próprio app antes de transmitir.
+
+**Linux:**
+- Use o checkbox "Incluir áudio do sistema" no modal de fonte
+- No Wayland com PipeWire, o portal do sistema deixa você escolher a fonte de áudio separadamente
+- **⚠️ Discord:** exclua a fonte de áudio do Discord no seletor do PipeWire, ou mute o Discord antes de transmitir.
+
 ---
 
 ## Rodar em desenvolvimento
