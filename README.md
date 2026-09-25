@@ -1,88 +1,80 @@
 # Tela Compartilhada
 
-Compartilhamento de tela P2P via **Radmin VPN** — sem servidor pago, até **1080p 60fps**.  
-Funciona no **Windows** e no **Linux** (X11 e Wayland).
+Compartilhamento de tela P2P via **Radmin VPN** — sem servidor pago, até **1080p 60fps**.
+
+---
+
+## ⬇️ Download
+
+| Plataforma | Link |
+|------------|------|
+| **Windows** (portátil, sem instalar) | [TelaCompartilhada-Portable-1.2.0.exe](https://github.com/GabrielAzevedoCr/tela-compartilhada/releases/download/v1.2.0/TelaCompartilhada-Portable-1.2.0.exe) |
+| **Linux** (AppImage) | [Gerar no Linux — veja abaixo ↓](#linux) |
+
+> Todas as versões: [github.com/GabrielAzevedoCr/tela-compartilhada/releases](https://github.com/GabrielAzevedoCr/tela-compartilhada/releases)
+
+---
+
+## ⚠️ O .exe NÃO funciona no Linux
+
+O arquivo `.exe` é um executável **Windows**. No Linux ele abre mas fica com **tela preta** porque o sistema não sabe como rodar um `.exe` nativamente.
+
+Para usar no Linux você precisa gerar o **AppImage** — veja abaixo.
+
+---
+
+## Linux
+
+O AppImage precisa ser gerado no próprio Linux. Abra o terminal e rode:
+
+```bash
+# 1. Baixe o código fonte
+git clone https://github.com/GabrielAzevedoCr/tela-compartilhada.git
+cd tela-compartilhada
+
+# 2. Gere o AppImage (instala Node automaticamente se precisar)
+bash build-linux.sh
+```
+
+Após finalizar, o arquivo estará em `dist/`. Execute assim:
+
+```bash
+chmod +x dist/*.AppImage
+./dist/*.AppImage
+```
+
+### Wayland (GNOME, KDE moderno)
+O seletor de tela abre automaticamente via portal do sistema.
+
+### X11
+Funciona igual ao Windows — abre um modal visual para escolher a tela/janela.
 
 ---
 
 ## Como funciona
 
-- Quem quer compartilhar a tela **cria uma sala** (vira o servidor de sinalização WebSocket).
-- Quem quer assistir **entra na sala** usando o IP da Radmin VPN do criador (`26.x.x.x:porta`).
-- O vídeo vai **direto de PC para PC** via WebRTC — sem servidor intermediário.
-
----
-
-## Instalar dependências
-
-```bash
-npm install
-```
-
-> Na primeira vez pode pedir aprovação do script do Electron:
-> ```bash
-> npm approve-scripts electron@33.4.0
-> npm install
-> ```
+- Quem compartilha a tela **cria uma sala** (vira o servidor WebSocket).
+- Quem quer assistir **entra na sala** com o IP da Radmin VPN do criador (`26.x.x.x:porta`).
+- O vídeo vai **direto de PC para PC** via WebRTC — sem servidor intermediário pago.
 
 ---
 
 ## Rodar em desenvolvimento
 
 ```bash
+npm install
 npm start
 ```
 
 ---
 
-## Gerar executável
-
-### Windows (.exe — instalador NSIS + portátil)
+## Gerar o .exe (Windows)
 
 ```bash
-npm run dist:win
+node fix-cache.js
 ```
 
-> **Atenção (Windows sem Developer Mode):**  
-> Se o build travar com erro de `symlink`, rode o build diretamente com:
-> ```bash
-> set CSC_IDENTITY_AUTO_DISCOVERY=false && npx electron-builder --win portable --x64
-> ```
-> Ou ative o **Modo Desenvolvedor** em:  
-> Configurações → Sistema → Para Desenvolvedores → Modo Desenvolvedor ✔
-
-### Linux (.AppImage + .deb)
-
-```bash
-npm run dist:linux
-```
-
-Os arquivos gerados ficam na pasta `dist/`.
-
----
-
-## Linux — captura de tela
-
-| Ambiente | Comportamento |
-|----------|--------------|
-| **X11**  | Modal de seleção visual igual ao Windows |
-| **Wayland** | Abre o seletor nativo do sistema (portal XDG) |
-
-Se a captura não funcionar no Wayland, inicie assim:
-```bash
-./TelaCompartilhada-*.AppImage --enable-features=WebRTCPipeWireCapturer
-```
-
----
-
-## Windows Defender
-
-O executável **não tem assinatura digital** (requer certificado pago).  
-Para evitar alertas do Defender:
-
-1. Use o **instalador NSIS** (`TelaCompartilhada-Setup-*.exe`) — menos suspeito que portátil.
-2. Adicione uma exceção no Defender para a pasta de instalação.
-3. Para distribuição pública, considere assinar com um certificado EV (~$300/ano).
+O `.exe` fica em `dist/TelaCompartilhada-Portable-*.exe`.
 
 ---
 

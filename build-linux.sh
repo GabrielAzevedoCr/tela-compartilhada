@@ -1,30 +1,37 @@
 #!/bin/bash
-# ─────────────────────────────────────────────────────────────────────────────
-# build-linux.sh — Gera o AppImage do Tela Compartilhada no Linux
+# Roda este script no Linux para gerar o AppImage
 # Uso: bash build-linux.sh
-# ─────────────────────────────────────────────────────────────────────────────
 
 set -e
 cd "$(dirname "$0")"
 
-echo "→ Verificando Node.js..."
+echo "==> Verificando Node.js..."
 if ! command -v node &>/dev/null; then
-  echo "✗ Node.js não encontrado. Instale com:"
-  echo "  curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -"
-  echo "  sudo apt-get install -y nodejs"
-  exit 1
+  echo "Node.js nao encontrado. Instalando via NVM..."
+  curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+  export NVM_DIR="$HOME/.nvm"
+  source "$NVM_DIR/nvm.sh"
+  nvm install 20
+  nvm use 20
 fi
-echo "✓ Node $(node -v)"
+echo "Node: $(node -v) | npm: $(npm -v)"
 
-echo "→ Instalando dependências..."
+echo ""
+echo "==> Instalando dependencias..."
 npm install
 
-echo "→ Gerando AppImage e .deb..."
-CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --linux --x64
+echo ""
+echo "==> Gerando AppImage..."
+CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --linux AppImage --x64
 
 echo ""
-echo "✓ Pronto! Arquivos gerados em dist/"
-ls -lh dist/*.AppImage dist/*.deb 2>/dev/null || true
+echo "============================================"
+echo " Pronto! Arquivo gerado em dist/"
+echo "============================================"
+ls -lh dist/*.AppImage 2>/dev/null
+
 echo ""
-echo "Para rodar:"
-echo "  chmod +x dist/*.AppImage && ./dist/*.AppImage"
+echo "Para executar:"
+APPIMAGE=$(ls dist/*.AppImage 2>/dev/null | head -1)
+echo "  chmod +x \"$APPIMAGE\""
+echo "  .\"$APPIMAGE\""
